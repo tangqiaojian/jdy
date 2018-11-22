@@ -126,45 +126,45 @@ public class WechatApi {
         String result = "00";
         try {
             // 检验请求key值是否合法
-                // 检查参数
-                    Session session = Jurisdiction.getSession();
-                        // ID 主键
-                        pd.put("USER_ID", UuidUtil.get32UUID());
-                        // 角色ID fhadminzhuche 为注册用户
-                        pd.put("ROLE_ID", "fhadminzhuche");
-                        // 编号
-                        pd.put("NUMBER", "");
-                        // pd.put("PHONE", ""); //手机号
-                        // 备注
-                        pd.put("BZ", "注册用户");
-                        // 最后登录时间
-                        pd.put("LAST_LOGIN", "");
-                        // IP
-                        pd.put("IP", "");
-                        // 状态
-                        pd.put("STATUS", "0");
-                        pd.put("SKIN", "default");
-                        // 默认名称
-                        pd.put("NAME", "普通用户");
-                        // 默认邮箱
-                        pd.put("EMAIL", "XXXXXXXX@163.com");
+            // 检查参数
+            Session session = Jurisdiction.getSession();
+            // ID 主键
+            pd.put("USER_ID", UuidUtil.get32UUID());
+            // 角色ID fhadminzhuche 为注册用户
+            pd.put("ROLE_ID", "fhadminzhuche");
+            // 编号
+            pd.put("NUMBER", "");
+            // pd.put("PHONE", ""); //手机号
+            // 备注
+            pd.put("BZ", "注册用户");
+            // 最后登录时间
+            pd.put("LAST_LOGIN", "");
+            // IP
+            pd.put("IP", "");
+            // 状态
+            pd.put("STATUS", "0");
+            pd.put("SKIN", "default");
+            // 默认名称
+            pd.put("NAME", "普通用户");
+            // 默认邮箱
+            pd.put("EMAIL", "XXXXXXXX@163.com");
 
-                        pd.put("RIGHTS", "");
-                        // 密码加密
-                        pd.put("PASSWORD",
-                                new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());
-                        // 判断用户名是否存在
-                        if (null == userService.findByUsername(pd)) {
-                            // 执行保存
-                            userService.saveU(pd);
-                            FHLOG.save(pd.getString("USERNAME"), "新注册");
-                            result="注册成功";
-                            json.put("result", result);
-                        } else {
-                            // 用户名已存在
-                            result = "用户名已存在";
-                            json.put("result", result);
-                        }
+            pd.put("RIGHTS", "");
+            // 密码加密
+            pd.put("PASSWORD",
+                    new SimpleHash("SHA-1", pd.getString("USERNAME"), pd.getString("PASSWORD")).toString());
+            // 判断用户名是否存在
+            if (null == userService.findByUsername(pd)) {
+                // 执行保存
+                userService.saveU(pd);
+                FHLOG.save(pd.getString("USERNAME"), "新注册");
+                result="注册成功";
+                json.put("result", result);
+            } else {
+                // 用户名已存在
+                result = "用户名已存在";
+                json.put("result", result);
+            }
 
 
         } catch (Exception e) {
@@ -176,32 +176,22 @@ public class WechatApi {
 
         return json;
     }
-/**
- *
- * 门店信息
- */
-      private DaoSupport dao;
+    /**
+     *
+     * 门店信息
+     */
+    private DaoSupport dao;
     @RequestMapping(value = "/storesMsg.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin(origins = "*", maxAge = 3600)
     public JsonResult storesMsg(HttpServletRequest request) throws Exception {
         JsonResult json=JsonResult.of();
-       List s=userService.getStore();
+        //获取所有门店信息
+        List s=userService.getStore();
         json.put("all", s);
         return json;
     }
-    /**
-     * 校验用户名是否存在
-     *
-     * @throws Exception
-     */
-    @ResponseBody
-    @RequestMapping("cheackUserName")
-    public Boolean checkUserName() throws Exception {
-        PageData pd = bb.getPageData();
-        return userService.findByUsername(pd) == null;
 
-    }
     /**
      * 我的信息
      *
@@ -211,7 +201,9 @@ public class WechatApi {
     @CrossOrigin(origins = "*", maxAge = 3600)
     public JsonResult MsgToMe(HttpServletRequest request) throws Exception {
         JsonResult json=JsonResult.of();
+        //获取用户信息id
         String USER_ID=request.getParameter("USER_ID");
+        //查找用户信息
         User user=userService.getUserAndRoleById(USER_ID);
         //   JSONArray j=JSONArray.fromObject(request.getSession().getAttribute(Const.SESSION_USER));
         /*        User user=userService.getUserAndRoleById(USER_ID);*/
