@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>充值中心</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" type="text/css" href="css/public.css" />
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/layer.js"></script>
+<script>
+//px转换为rem
+(function(doc, win) {
+    var docEl = doc.documentElement,
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+        recalc = function() {
+            var clientWidth = docEl.clientWidth;
+            if (!clientWidth) return;
+            if (clientWidth >= 750) {
+                docEl.style.fontSize = '100px';
+            } else {
+                docEl.style.fontSize = 100 * (clientWidth / 750) + 'px';
+            }
+        };
+
+    if (!doc.addEventListener) return;
+    win.addEventListener(resizeEvt, recalc, false);
+    doc.addEventListener('DOMContentLoaded', recalc, false);
+})(document, window);
+</script>
+</head>
+<body>
+<div class="recharge">
+    <span class="recharge-back"><a href="javascript:history.go(-1);"></a></span>
+    <div class="recharge-title">充值中心</div>   
+    <!--  <a href="#" class="record">充值记录</a> -->
+</div>
+<div class="recharge-input">
+    <input id="phone_num" type="text" name="" value="" class="recharge-inp">
+    <a href="#" class="recharge-input-a"><img src="images/recharge-icon01.png"></a>
+    <p>默认号码（福建移动）</p>
+</div>
+<div class="telephone-fees">
+    <h1>充话费</h1>
+    <ul id="btn_con" class="clearfix">
+        <li>
+            <a  href="#">
+                <p>10元</p>
+                <em>售价:10.00元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>20元</p>
+                <em>售价:20.00元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>30元</p>
+                <em>售价:30.00元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>50元</p>
+                <em>售价:49.99元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>100元</p>
+                <em>售价:99.98元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>200元</p>
+                <em>售价:199.96元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>300元</p>
+                <em>售价:299.94元</em>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <p>500元</p>
+                <em>售价:499.90元</em>
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript">
+	$(function(){
+		$("#btn_con li").bind("click",function(){
+			var phone_num = $("#phone_num").val();
+			if(phone_num==''){
+				layer.msg("请输入手机号码");
+				return;
+			}else if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(phone_num))){
+				layer.msg("请输入正确手机号");
+				return;
+			}
+			var fee = $(this).find("em").text().replace("售价:","");
+			layer.msg("请稍后..");
+			setTimeout(function(){
+				layer.confirm('电信话费充值'+fee, {icon:1, title:'充值'}, function(index){
+					layer.close();
+					layer.msg("充值成功");
+				});
+			}, 1000)
+		})
+	})
+</script>
+</html>

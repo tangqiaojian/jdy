@@ -1,0 +1,141 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+html,body{
+  font-size: 10px;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+}
+ul,li{
+  list-style: none;
+}
+.layoutBox{
+  width: 283px;
+  height: 425px;
+  border:1px solid #000;
+
+}
+.tc{
+  text-align: center;
+}
+.bd{
+  border-bottom: 1px solid #000;
+}
+.flex{
+  display: flex;
+  display: -moz-flex;
+  display: -webkit-flex;
+  align-items: center;
+}
+.flexCell{
+  flex:1;
+  -moz-flex:1;
+  -webkit-flex:1;
+}
+.flexcell2{
+  flex:2;
+  -moz-flex:2;
+  -webkit-flex:2;
+}
+.flexcell3{
+  flex:3;
+  -moz-flex:3;
+  -webkit-flex:3;
+}
+.mainbox{
+  border:1px solid #000;
+  width: 273px;
+  height: 415px;
+  margin:4px;
+}
+.logoDiv{
+  padding: 4px;
+  border-bottom: 1px solid #000;
+  justify-content: space-between;
+  text-align: center;
+}
+.logoimg{
+  width: 88px;
+}
+.tiaoxingimg{
+  width: 170px;
+  font-size: 0.8rem;
+}
+
+.receiptInformation{
+  padding: 4px;
+  border-bottom: 1px solid #000;
+}
+.receiptMsg{
+  border-right: 1px solid #000;
+  flex:4;
+  -moz-flex:4;
+  -webkit-flex:4;
+  width: 156px;
+}
+/* .receiptMsg p{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  } */
+.receiptWeight{
+  flex:3;
+  -moz-flex:3;
+  -webkit-flex:3;
+  padding-left: 10px;
+  font-size: 1.4rem;
+}
+.takeDelivery{
+  padding: 4px;
+  border-bottom: 1px solid #000;
+  line-height: 1.6rem;
+}
+.weightMsg{
+  font-weight: bold;
+  padding: 4px;
+  border-bottom: 1px solid #000;
+}
+.weightMsg div{
+
+}
+.weightMsg div:nth-child(2){
+  width: 24%;
+}
+.weightMsg div:last-child{
+  width: 38%;
+}
+
+.signSection{
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 4px;
+  align-items: flex-start;
+  border-bottom: 1px solid #000;
+}
+.signSection textarea{
+  width: 120px;
+  border:none;
+  list-style: none;
+  height:25px;
+  resize:none;
+}
+.signSection div{
+  height: 50px;
+}
+.signSection div:nth-child(2){
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  padding: 0 2px;
+  width:20%;
+  text-align:center;
+}
+.scanImg{
+  padding-top: 4px;
+  border-bottom: 1px solid #000;
+  text-align: center;
+}
+.tuihuoAddr{
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 4px;
+}

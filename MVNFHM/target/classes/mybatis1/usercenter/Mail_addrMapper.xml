@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Mail_addrMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		T_MAIL_ADDR
+	</sql>
+
+	<!-- 字段 -->
+	<sql id="Field">
+		SENDER,
+		S_ADDRESS,
+		D_ADDRESS,
+		PHONE,
+		M_TYPE,
+		IS_DEFAULT,
+		CREATEBY,
+		CREATETIME,
+		UPDATEBY,
+		UPDATETIME,
+		ISDElETE,
+		CARD_NO,
+		ZIP_CODE,
+		FACE,
+		OPPOSITE,
+		MAIL_ADDR_ID
+	</sql>
+
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{SENDER},
+		#{S_ADDRESS},
+		#{D_ADDRESS},
+		#{PHONE},
+		#{M_TYPE},
+		#{IS_DEFAULT},
+		#{CREATEBY},
+		#{CREATETIME},
+		#{UPDATEBY},
+		#{UPDATETIME},
+		#{ISDElETE},
+		#{CARD_NO},
+		#{ZIP_CODE},
+		#{FACE},
+		#{OPPOSITE},
+		#{MAIL_ADDR_ID}
+	</sql>
+
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+
+	<!-- 删除 -->
+	<update id="delete">
+	    update
+		<include refid="tableName"></include>
+		set
+	      ISDElETE = 1
+	    where
+		  MAIL_ADDR_ID = #{MAIL_ADDR_ID}
+	</update>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		SENDER = #{SENDER},
+		S_ADDRESS = #{S_ADDRESS},
+		D_ADDRESS = #{D_ADDRESS},
+		PHONE = #{PHONE},
+        CARD_NO= #{CARD_NO},
+		ZIP_CODE = #{ZIP_CODE},
+		<if test="M_TYPE!=null and M_TYPE!=''">
+			M_TYPE = #{M_TYPE},
+		</if>
+		<if test="IS_DEFAULT!=null and IS_DEFAULT!=''">
+			IS_DEFAULT = #{IS_DEFAULT},
+		</if>
+		<if test="CREATEBY!=null and CREATEBY!=''">
+			CREATEBY = #{CREATEBY},
+		</if>
+		<if test="CREATETIME!=null">
+			CREATETIME = #{CREATETIME},
+		</if>
+		<if test="UPDATEBY!=null and UPDATEBY!=''">
+			UPDATEBY = #{UPDATEBY},
+		</if>
+		<if test="UPDATETIME!=null">
+			UPDATETIME = #{UPDATETIME},
+		</if>
+		<if test="FACE!=null and FACE!=''">
+		    FACE = #{FACE},
+		</if>
+		<if test="OPPOSITE!=null and OPPOSITE!=''">
+		   OPPOSITE =  #{OPPOSITE},
+		</if>
+		MAIL_ADDR_ID = MAIL_ADDR_ID
+		where
+		MAIL_ADDR_ID = #{MAIL_ADDR_ID}
+	</update>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		MAIL_ADDR_ID = #{MAIL_ADDR_ID}
+	</select>
+
+	<!-- 列表 -->
+	<select id="datalistAll" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+			SENDER LIKE CONCAT('%', #{pd.keywords},'%')
+			or
+			PHONE LIKE CONCAT('%', #{pd.keywords},'%')
+			)
+		</if>		
+		and M_TYPE = #{pd.M_TYPE} and CREATEBY = #{pd.CREATEBY} and  ISDElETE = 0
+		<if test="pd.M_TYPE =='1'">
+		Order by CREATETIME ASC
+		</if>
+		<if test="pd.M_TYPE =='0'">
+			Order by CREATETIME DESC
+		</if>
+	</select>
+
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+
+   <update id="deleteAll" parameterType="String">
+	    update
+		<include refid="tableName"></include>
+		set
+	      ISDElETE = 1
+	    where
+		 MAIL_ADDR_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	
+
+	<!-- fh313596790qq(青苔) -->
+
+	<!-- 根据创建用户,类型修改 -->
+	<update id="editDefault" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		IS_DEFAULT = #{IS_DEFAULT}
+		<where>
+			<if test="M_TYPE!=null and M_TYPE!=''">
+				M_TYPE = #{M_TYPE}
+			</if>
+			<if test="CREATEBY!=null and CREATEBY!=''">
+				and CREATEBY = #{CREATEBY}
+			</if>
+			<if test="MAIL_ADDR_ID!=null and MAIL_ADDR_ID!=''">
+				MAIL_ADDR_ID = #{MAIL_ADDR_ID}
+			</if>
+		</where>
+	</update>
+	
+	<!-- 查询我的默认地址 无返回最新的一条数据 -->
+    <select id="queryMyDefault" parameterType="pd" resultType="pd">
+	  SELECT SENDER,S_ADDRESS,D_ADDRESS,PHONE,CARD_NO,ZIP_CODE,FACE,OPPOSITE FROM t_mail_addr
+	     WHERE M_TYPE = #{M_TYPE} AND CREATEBY = #{CREATEBY}
+	  ORDER BY IS_DEFAULT DESC,CREATETIME DESC LIMIT 1
+    </select>	
+
+
+
+
+</mapper>

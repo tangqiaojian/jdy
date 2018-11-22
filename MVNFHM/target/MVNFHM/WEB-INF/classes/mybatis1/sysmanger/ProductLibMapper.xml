@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProductLibMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		T_PRODUCTLIB
+	</sql>
+
+	<!-- 字段 -->
+	<sql id="Field">
+		PL_CODE,
+		PL_TYPE,
+		PL_BRAND,
+		PL_NAME,
+		PL_SPECMODEL,
+		PL_WEIGHT,
+		PL_PRICE,
+		PL_PRO_COUNTRY,
+		PL_PRO_ENTERPRISES,
+		PL_PUR_COUNTRY,
+		PL_ORIGIN,
+		BAR_CODE,
+		PL_EXPLAIN,
+		PRODUCTLIB_ID
+	</sql>
+
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{PL_CODE},
+		#{PL_TYPE},
+		#{PL_BRAND},
+		#{PL_NAME},
+		#{PL_SPECMODEL},
+		#{PL_WEIGHT},
+		#{PL_PRICE},
+		#{PL_PRO_COUNTRY},
+		#{PL_PRO_ENTERPRISES},
+		#{PL_PUR_COUNTRY},
+		#{PL_ORIGIN},
+		#{BAR_CODE},
+		#{PL_EXPLAIN},
+		#{PRODUCTLIB_ID}
+	</sql>
+
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where
+		PRODUCTLIB_ID = #{PRODUCTLIB_ID}
+	</delete>
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		PL_CODE = #{PL_CODE},
+		PL_TYPE = #{PL_TYPE},
+		PL_BRAND = #{PL_BRAND},
+		PL_NAME = #{PL_NAME},
+		PL_WEIGHT = #{PL_WEIGHT},
+		PL_PRICE = #{PL_PRICE},
+		PL_PRO_COUNTRY = #{PL_PRO_COUNTRY},
+		PL_PRO_ENTERPRISES =
+		#{PL_PRO_ENTERPRISES},
+		PL_PUR_COUNTRY = #{PL_PUR_COUNTRY},
+		PL_ORIGIN =
+		#{PL_ORIGIN},
+		BAR_CODE = #{BAR_CODE},
+		PL_EXPLAIN = #{PL_EXPLAIN},
+		PL_SPECMODEL = #{PL_SPECMODEL},
+		PRODUCTLIB_ID = PRODUCTLIB_ID
+		where
+		PRODUCTLIB_ID = #{PRODUCTLIB_ID}
+	</update>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		PRODUCTLIB_ID = #{PRODUCTLIB_ID}
+	</select>
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT
+		l.*,m.PRO_TYPE,m.PRODUCTMANAGER_ID
+		FROM
+		t_productlib l
+		INNER JOIN
+		t_productmanager m ON l.PL_TYPE = m.PRODUCTMANAGER_ID
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+
+			l.PL_BRAND LIKE CONCAT('%', #{pd.keywords},'%')
+			or
+			l.PL_NAME LIKE
+			CONCAT('%', #{pd.keywords},'%')
+			or
+			l.BAR_CODE LIKE
+			CONCAT('%', #{pd.keywords},'%')
+			<!-- 根据需求自己加检索条件 字段1 LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') or 字段2 
+				LIKE CONCAT(CONCAT('%', #{pd.keywords}),'%') -->
+			)
+		</if>
+		<if test="pd.PRO_TYPE!=null and pd.PRO_TYPE!=''">
+			AND l.PL_TYPE =#{pd.PRO_TYPE}
+		</if>
+	</select>
+
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where
+		PRODUCTLIB_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- fh313596790qq(青苔) -->
+
+
+	<!-- 获取品牌列表 -->
+	<select id="getBrand" parameterType="String" resultType="String">
+		SELECT
+		PL_BRAND from t_productlib WHERE PL_TYPE = #{0} GROUP BY
+		PL_BRAND
+	</select>
+
+	<!-- 获取商品名称 -->
+	<select id="getPlName" parameterType="pd" resultType="String">
+		SELECT
+		PL_NAME from t_productlib WHERE PL_TYPE = #{PL_TYPE} AND PL_BRAND=
+		#{PL_BRAND} GROUP BY PL_NAME
+	</select>
+
+	<!-- 获取规格型号整数据 -->
+	<select id="selectPro" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		WHERE PL_TYPE = #{PL_TYPE} AND PL_BRAND= #{PL_BRAND} AND PL_NAME =
+		#{PL_NAME}
+	</select>
+
+
+
+	<resultMap id="BaseResultMap" type="com.fh.entity.order.ParcelArticles">
+		<id column="PRODUCTLIB_ID" property="PARCELARTICLES_ID" jdbcType="VARCHAR" />
+		<result column="PRO_TYPE" property="PA_TYPE" jdbcType="VARCHAR" />
+		<result column="PL_BRAND" property="PA_BRAND" jdbcType="VARCHAR" />
+		<result column="PL_NAME" property="PA_PM" jdbcType="VARCHAR" />
+		<result column="PL_SPECMODEL" property="PA_SPEC" jdbcType="VARCHAR" />
+		<result column="PL_PRICE" property="PA_PRICE" jdbcType="VARCHAR" />
+		<result column="PL_WEIGHT" property="PA_WEIGHT" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 根据条形码获取商品 -->
+	<select id="selectByBarCode" parameterType="String" resultMap="BaseResultMap">
+		SELECT
+			pl.*,pm.PRO_TYPE
+		FROM
+			t_productlib pl
+		LEFT JOIN t_productmanager pm ON pl.PL_TYPE = pm.PRODUCTMANAGER_ID
+		where pl.BAR_CODE = #{BAR_CODE}
+	</select>
+
+     <select id="selectByBSN" parameterType="pd" resultMap="BaseResultMap">
+		SELECT
+		  <include refid="Field"></include>
+		FROM
+			t_productlib 
+	    WHERE PL_BRAND = #{PL_BRAND}  AND PL_SPECMODEL = #{PL_SPECMODEL}  AND PL_NAME = #{PL_NAME}
+	</select>
+
+
+</mapper>

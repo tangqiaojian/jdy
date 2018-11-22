@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		T_ORDER
+	</sql>
+
+	<!-- 字段 -->
+	<sql id="Field">
+		ORDERNO,
+		STOREID,
+		SENDER,
+		ADDRESSEE,
+		SENDERSTR,
+		ADDRESSEESTR,
+		CREATEBY,
+		CREATETIME,
+		UPDATEBY,
+		UPDATETIME,
+		ISDELETE,
+		STATEA,
+		FREIGHT,
+		LOGISTICS,
+		DISCOUNT,
+		PALLET_NO,
+		PALLET_TIME,
+		AVIATION_NO,
+		DELIVERY_TIME,
+		APPLY_STATUS,
+		CUSTOMER_ID,
+		ORDER_ID
+	</sql>
+
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{ORDERNO},
+		#{STOREID},
+		#{SENDER},
+		#{ADDRESSEE},
+		#{SENDERSTR},
+		#{ADDRESSEESTR},
+		#{CREATEBY},
+		#{CREATETIME},
+		#{UPDATEBY},
+		#{UPDATETIME},
+		#{ISDELETE},
+		#{STATEA},
+		#{FREIGHT},
+		#{LOGISTICS},
+		#{DISCOUNT},
+		#{PALLET_NO},
+		#{PALLET_TIME},
+		#{AVIATION_NO},
+		#{DELIVERY_TIME},
+		#{APPLY_STATUS},
+		#{CUSTOMER_ID},
+		#{ORDER_ID}
+	</sql>
+
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where
+		ORDER_ID = #{ORDER_ID}
+	</delete>
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		<if test="STOREID!=null and STOREID!=''">
+			STOREID = #{STOREID},
+		</if>
+		<if test="SENDER!=null and SENDER!=''">
+			SENDER = #{SENDER},
+		</if>
+		<if test="ADDRESSEE!=null and ADDRESSEE!=''">
+			ADDRESSEE = #{ADDRESSEE},
+		</if>
+		<if test="SENDERSTR!=null and SENDERSTR!=''">
+			SENDERSTR = #{SENDERSTR},
+		</if>
+		<if test="ADDRESSEESTR!=null and ADDRESSEESTR!=''">
+			ADDRESSEESTR = #{ADDRESSEESTR},
+		</if>
+		<if test="ORDERNO!=null and ORDERNO!=''">
+			ORDERNO = #{ORDERNO},
+		</if>
+		<if test="STATEA!=null and STATEA!=''">
+			STATEA = #{STATEA},
+		</if>
+		<if test="CREATEBY!=null and CREATEBY!=''">
+			CREATEBY = #{CREATEBY},
+		</if>
+		<if test="CREATETIME!=null">
+			CREATETIME = #{CREATETIME},
+		</if>
+		<if test="UPDATEBY!=null and UPDATEBY!=''">
+			UPDATEBY = #{UPDATEBY},
+		</if>
+		<if test="UPDATETIME!=null and UPDATETIME!=''">
+			UPDATETIME = #{UPDATETIME},
+		</if>
+		<if test="FREIGHT!=null">
+			FREIGHT = #{FREIGHT},
+		</if>
+		<if test="LOGISTICS!=null and LOGISTICS!=''">
+			LOGISTICS = #{LOGISTICS},
+		</if>
+		<if test="DISCOUNT!=null">
+			DISCOUNT = #{DISCOUNT},
+		</if>
+		<if test="APPLY_STATUS!=null">
+			APPLY_STATUS = #{APPLY_STATUS},
+		</if>
+		<if test="ISDELETE!=null">
+			ISDELETE = #{ISDELETE},
+		</if>
+		ORDER_ID = ORDER_ID
+		where
+		ORDER_ID = #{ORDER_ID}
+	</update>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		SELECT
+		o.*,s.S_NAME AS STORENAME
+		FROM
+		t_order o
+		LEFT JOIN t_store s ON o.STOREID
+		= s.STORE_ID
+		where
+		o.ORDER_ID = #{ORDER_ID}
+	</select>
+
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+
+			ORDERNO = #{pd.keywords}
+
+			)
+		</if>
+		<if test="pd.STATEA!=null and pd.STATEA!=''">
+			AND STATEA = #{pd.STATEA}
+		</if>
+
+		<if test="pd.order_type !=null and pd.order_type!=''">
+			AND find_in_set(STATEA,#{pd.order_type})
+		</if>
+
+		<if test="pd.CREATEBY!=null and pd.CREATEBY!=''">
+			AND CREATEBY = #{pd.CREATEBY}
+		</if>
+		<if test="pd.STOREID !=null and pd.STOREID!=''">  <!-- 门店刷选 -->
+			AND STOREID = #{pd.STOREID}
+		</if>
+		<if test="pd.ISDELETE !=null and pd.ISDELETE!='' ">
+			AND ISDELETE = #{pd.ISDELETE}
+		</if>
+		order by CREATETIME desc,CREATEBY
+	</select>
+
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where
+		ORDER_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+
+	<!-- fh313596790qq(青苔) -->
+	<resultMap id="BaseResultMap" type="com.fh.entity.order.Order">
+		<id column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+		<result column="ORDERNO" property="ORDERNO" jdbcType="VARCHAR" />
+		<result column="STOREID" property="STOREID" jdbcType="VARCHAR" />
+		<result column="SENDER" property="SENDER" jdbcType="VARCHAR" />
+		<result column="SENDERSTR" property="SENDERSTR" jdbcType="VARCHAR" />
+		<result column="ADDRESSEE" property="ADDRESSEE" jdbcType="VARCHAR" />
+		<result column="ADDRESSEESTR" property="ADDRESSEESTR" jdbcType="VARCHAR" />
+		<result column="CREATEBY" property="CREATEBY" jdbcType="VARCHAR" />
+		<result column="CREATETIME" property="CREATETIME" jdbcType="VARCHAR" />
+		<result column="UPDATEBY" property="UPDATEBY" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="UPDATETIME" jdbcType="VARCHAR" />
+		<result column="ISDELETE" property="ISDELETE" jdbcType="INTEGER" />
+		<result column="STATEA" property="STATEA" jdbcType="INTEGER" />
+		<result column="FREIGHT" property="FREIGHT" jdbcType="VARCHAR" />
+		<result column="LOGISTICS" property="LOGISTICS" jdbcType="VARCHAR" />
+		<result column="STORENAME" property="STORENAME" jdbcType="VARCHAR" />
+		<result column="CUSTOMER_ID" property="CUSTOMER_ID" jdbcType="VARCHAR" />
+		<!-- <association property="parcelCount" column="ORDER_ID" select="ParcelMapper.getCountByOrderId"></association> -->
+		<collection property="parcelArticles" column="ORDER_ID"
+			select="ParcelArticlesMapper.selectByOrderId"></collection>
+		<collection property="parcels" column="ORDER_ID"
+			select="ParcelMapper.selectByOrderId"></collection>
+	</resultMap>
+
+
+	<resultMap id="BaseResultMap_2" type="com.fh.entity.order.Order">
+		<id column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+		<result column="ORDERNO" property="ORDERNO" jdbcType="VARCHAR" />
+		<result column="STOREID" property="STOREID" jdbcType="VARCHAR" />
+		<result column="SENDER" property="SENDER" jdbcType="VARCHAR" />
+		<result column="SENDERSTR" property="SENDERSTR" jdbcType="VARCHAR" />
+		<result column="ADDRESSEE" property="ADDRESSEE" jdbcType="VARCHAR" />
+		<result column="ADDRESSEESTR" property="ADDRESSEESTR" jdbcType="VARCHAR" />
+		<result column="CREATEBY" property="CREATEBY" jdbcType="VARCHAR" />
+		<result column="CREATETIME" property="CREATETIME" jdbcType="VARCHAR" />
+		<result column="UPDATEBY" property="UPDATEBY" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="UPDATETIME" jdbcType="VARCHAR" />
+		<result column="ISDELETE" property="ISDELETE" jdbcType="INTEGER" />
+		<result column="STATEA" property="STATEA" jdbcType="INTEGER" />
+		<result column="FREIGHT" property="FREIGHT" jdbcType="VARCHAR" />
+		<result column="LOGISTICS" property="LOGISTICS" jdbcType="VARCHAR" />
+		<result column="STORENAME" property="STORENAME" jdbcType="VARCHAR" />
+		<result column="PALLET_NO" property="PALLET_NO" jdbcType="VARCHAR" />
+		<result column="PALLET_TIME" property="PALLET_TIME" jdbcType="VARCHAR" />
+		<result column="AVIATION_NO" property="AVIATION_NO" jdbcType="VARCHAR" />
+		<result column="CUSTOMER_ID" property="CUSTOMER_ID" jdbcType="VARCHAR" />
+		<result column="DELIVERY_TIME" property="DELIVERY_TIME"
+			jdbcType="VARCHAR" />
+		<association property="parcelCount" column="ORDER_ID"
+			select="ParcelMapper.getCountByOrderId"></association>
+	</resultMap>
+
+
+
+	<resultMap id="BaseResultMap_3" type="com.fh.entity.order.Order">
+		<id column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+		<result column="ORDERNO" property="ORDERNO" jdbcType="VARCHAR" />
+		<result column="STOREID" property="STOREID" jdbcType="VARCHAR" />
+		<result column="SENDER" property="SENDER" jdbcType="VARCHAR" />
+		<result column="SENDERSTR" property="SENDERSTR" jdbcType="VARCHAR" />
+		<result column="ADDRESSEE" property="ADDRESSEE" jdbcType="VARCHAR" />
+		<result column="ADDRESSEESTR" property="ADDRESSEESTR" jdbcType="VARCHAR" />
+		<result column="CREATEBY" property="CREATEBY" jdbcType="VARCHAR" />
+		<result column="CREATETIME" property="CREATETIME" jdbcType="VARCHAR" />
+		<result column="UPDATEBY" property="UPDATEBY" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="UPDATETIME" jdbcType="VARCHAR" />
+		<result column="ISDELETE" property="ISDELETE" jdbcType="INTEGER" />
+		<result column="STATEA" property="STATEA" jdbcType="INTEGER" />
+		<result column="FREIGHT" property="FREIGHT" jdbcType="VARCHAR" />
+		<result column="CUSTOMER_ID" property="CUSTOMER_ID" jdbcType="VARCHAR" />
+		<result column="STORENAME" property="STORENAME" jdbcType="VARCHAR" />
+		<collection property="parcels" ofType="com.fh.entity.order.Parcel">
+			<id column="PARCEL_ID" property="PARCEL_ID" jdbcType="VARCHAR" />
+			<result column="PACK_NAME" property="PACK_NAME" jdbcType="VARCHAR" />
+			<result column="PACK_TYPE" property="PACK_TYPE" jdbcType="VARCHAR" />
+			<result column="PACK_TYPE_NAME" property="PACK_TYPE_NAME"
+				jdbcType="VARCHAR" />
+			<result column="FEE_SCALE" property="FEE_SCALE" jdbcType="VARCHAR" />
+			<result column="WEIGHT" property="WEIGHT" jdbcType="VARCHAR" />
+			<result column="PACK_COST" property="PACK_COST" jdbcType="VARCHAR" />
+			<result column="GOODS_PK" property="GOODS_PK" jdbcType="VARCHAR" />
+			<result column="TOTAL_COST" property="TOTAL_COST" jdbcType="VARCHAR" />
+			<result column="PACKJSONARR" property="PACKJSONARR" jdbcType="VARCHAR" />
+			<result column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+			<result column="COURIER" property="COURIER" jdbcType="VARCHAR" />
+			<result column="COURIER_BM" property="COURIER_BM" jdbcType="VARCHAR" />
+			<result column="LOGISTICS" property="LOGISTICS" jdbcType="VARCHAR" />
+			<result column="APPLY_STATUS" property="APPLY_STATUS"
+				jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+
+
+	<resultMap id="BaseResultMap_4" type="com.fh.entity.order.Order">
+		<id column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+		<result column="ORDERNO" property="ORDERNO" jdbcType="VARCHAR" />
+		<result column="STOREID" property="STOREID" jdbcType="VARCHAR" />
+		<result column="SENDER" property="SENDER" jdbcType="VARCHAR" />
+		<result column="SENDERSTR" property="SENDERSTR" jdbcType="VARCHAR" />
+		<result column="ADDRESSEE" property="ADDRESSEE" jdbcType="VARCHAR" />
+		<result column="ADDRESSEESTR" property="ADDRESSEESTR" jdbcType="VARCHAR" />
+		<result column="CREATEBY" property="CREATEBY" jdbcType="VARCHAR" />
+		<result column="CREATETIME" property="CREATETIME" jdbcType="VARCHAR" />
+		<result column="UPDATEBY" property="UPDATEBY" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="UPDATETIME" jdbcType="VARCHAR" />
+		<result column="ISDELETE" property="ISDELETE" jdbcType="INTEGER" />
+		<result column="STATEA" property="STATEA" jdbcType="INTEGER" />
+		<result column="FREIGHT" property="FREIGHT" jdbcType="VARCHAR" />
+		<result column="LOGISTICS" property="LOGISTICS" jdbcType="VARCHAR" />
+		<result column="STORENAME" property="STORENAME" jdbcType="VARCHAR" />
+		<result column="PALLET_NO" property="PALLET_NO" jdbcType="VARCHAR" />
+		<result column="PALLET_TIME" property="PALLET_TIME" jdbcType="VARCHAR" />
+		<result column="AVIATION_NO" property="AVIATION_NO" jdbcType="VARCHAR" />
+		<result column="CUSTOMER_ID" property="CUSTOMER_ID" jdbcType="VARCHAR" />
+		<result column="STORENAME" property="STORENAME" jdbcType="VARCHAR" />
+		<result column="DELIVERY_TIME" property="DELIVERY_TIME" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+     <select id="selectByOrderId" resultMap="BaseResultMap_4" parameterType="String">
+		SELECT
+		o.*,s.S_NAME AS STORENAME
+		FROM
+		t_order o
+		LEFT JOIN t_store s ON
+		o.STOREID = s.STORE_ID
+		where
+		o.ORDER_ID = #{ORDER_ID}
+	</select>
+
+	<!-- 获取待申请的订单信息 -->
+	<select id="selectByApplyStatus" resultMap="BaseResultMap_3">
+		SELECT
+		o.ORDER_ID,
+		o.STOREID,
+		o.SENDER,
+		o.SENDERSTR,
+		o.ADDRESSEE,
+		o.ADDRESSEESTR,
+		o.ISDELETE,
+		o.STATEA,
+		o.FREIGHT,
+		p.PARCEL_ID,
+		p.PACK_NAME,
+		p.PACK_TYPE,
+		p.PACK_TYPE_NAME,
+		p.FEE_SCALE,
+		p.WEIGHT,
+		p.GOODS_PK,
+		p.PACK_COST,
+		p.PACKJSONARR,
+		p.COURIER,
+		p.COURIER_BM,
+		p.LOGISTICS,
+		p.APPLY_STATUS
+		FROM
+		t_order o
+		LEFT JOIN t_parcel p ON o.ORDER_ID = p.ORDER_ID
+		WHERE
+		p.APPLY_STATUS = 1 limit 1000
+	</select>
+
+
+	<!-- 总仓列表 -->
+	<select id="datalistPage_local" parameterType="page" resultMap="BaseResultMap_2">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+			ORDERNO = #{pd.keywords}
+			)
+		</if>
+		<if test="pd.STATEA!=null and pd.STATEA!=''">
+			AND STATEA = #{pd.STATEA}
+		</if>
+		order by CREATEBY
+	</select>
+
+
+
+	<!-- 根据主键获取 -->
+	<select id="selectByPk" resultMap="BaseResultMap" parameterType="String">
+		SELECT
+		o.*,s.S_NAME AS STORENAME
+		FROM
+		t_order o
+		LEFT JOIN t_store s ON
+		o.STOREID = s.STORE_ID
+		where
+		o.ORDER_ID = #{ORDER_ID}
+	</select>
+
+
+	<!-- 获取用户已完成订单的总金额 -->
+	<select id="getSUMbyUser" parameterType="String" resultType="Double">
+		SELECT IFNULL(SUM(FREIGHT),0) from t_order where CREATEBY =
+		#{CREATEBY} AND STATEA = '5'
+	</select>
+
+
+	<!-- 获取订单的总金额 -->
+	<select id="getTotalCostBYOrderId" parameterType="String"
+		resultType="Double">
+		SELECT IFNULL(SUM(p.TOTAL_COST),0) FROM t_ORDER o LEFT JOIN
+		t_parcel p ON
+		o.ORDER_ID = p.ORDER_ID where o.ORDER_ID = #{0}
+	</select>
+
+
+	<!-- 批量修改订单状态 -->
+	<update id="editState" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		STATEA = #{STATEA},
+		<if test="PALLET_NO !=null and PALLET_NO!=''">
+			PALLET_NO = #{PALLET_NO},
+		</if>
+		<if test="AVIATION_NO !=null and AVIATION_NO!=''">
+			AVIATION_NO = #{AVIATION_NO},
+		</if>
+		<if test="PALLET_TIME !=null and PALLET_TIME!='' ">
+			PALLET_TIME = #{PALLET_TIME},
+		</if>
+		<if test="DELIVERY_TIME !=null and DELIVERY_TIME!=''">
+			DELIVERY_TIME = #{DELIVERY_TIME},
+		</if>
+		<if test="LOGISTICS!=null and LOGISTICS!=''">
+			LOGISTICS = #{LOGISTICS},
+		</if>
+
+		ORDER_ID = ORDER_ID
+		where
+		find_in_set(ORDER_ID ,#{ORDER_IDS})
+	</update>
+
+
+	<!-- 获取用下已完成的下单总数和下单总金额 -->
+	<select id="getCountAndSum" parameterType="String" resultType="pd">
+		SELECT COUNT(1) AS _count, IFNULL(SUM(FREIGHT), 0) AS _sum
+		FROM
+		t_order
+		WHERE
+		STATEA = '5' AND CREATEBY = #{CREATEBY}
+	</select>
+
+
+
+	<!-- 判断订单内的包裹是否都二次称重了 -->
+	<select id="isExistsNotWeight" parameterType="String"
+		resultType="Boolean">
+		SELECT EXISTS (
+		SELECT
+		o.ORDER_ID
+		FROM
+		t_order o LEFT JOIN
+		t_parcel p ON o.ORDER_ID = p.ORDER_ID
+		WHERE
+		o.ORDER_ID = #{0} AND
+		p.P_APPLY_STATUS = 0
+		)
+	</select>
+
+	<!-- 查询出所有包裹都清关的订单 -->
+	<select id="selectOrderIdbyExisitParcel" resultType="String">
+		SELECT
+		t.ORDER_ID FROM t_order t WHERE t.STATEA = 3 AND NOT EXISTS
+		(
+		SELECT
+		p.ORDER_ID FROM t_parcel p WHERE P_APPLY_STATUS &lt; 4 AND p.ORDER_ID
+		= t.ORDER_ID
+		)
+	</select>
+
+
+	<!-- 完成订单 -->
+	<select id="finishOrder" resultType="String">
+		SELECT t.ORDER_ID FROM
+		t_order t WHERE t.STATEA = 4 AND NOT EXISTS
+		(
+		SELECT p.ORDER_ID FROM
+		t_parcel p WHERE P_APPLY_STATUS &lt; 5 AND p.ORDER_ID
+		= t.ORDER_ID
+		)
+	</select>
+
+
+	<insert id="insert" parameterType="com.fh.entity.order.Order">
+		insert into t_order (ORDER_ID, ORDERNO, STOREID,
+		SENDER, SENDERSTR, ADDRESSEE,
+		ADDRESSEESTR, CREATEBY, CREATETIME,
+		UPDATEBY, UPDATETIME, ISDELETE,
+		STATEA, FREIGHT, LOGISTICS,
+		DISCOUNT, PALLET_NO, PALLET_TIME,
+		AVIATION_NO, DELIVERY_TIME, APPLY_STATUS,CUSTOMER_ID
+		)
+		values (#{ORDER_ID,jdbcType=VARCHAR}, #{ORDERNO,jdbcType=VARCHAR},
+		#{STOREID,jdbcType=VARCHAR},
+		#{SENDER,jdbcType=VARCHAR}, #{SENDERSTR,jdbcType=VARCHAR}, #{ADDRESSEE,jdbcType=VARCHAR},
+		#{ADDRESSEESTR,jdbcType=VARCHAR}, #{CREATEBY,jdbcType=VARCHAR},
+		#{CREATETIME,jdbcType=VARCHAR},
+		#{UPDATEBY,jdbcType=VARCHAR}, #{UPDATETIME,jdbcType=VARCHAR}, #{ISDELETE,jdbcType=INTEGER},
+		#{STATEA,jdbcType=INTEGER}, #{FREIGHT,jdbcType=DOUBLE},
+		#{LOGISTICS,jdbcType=VARCHAR},
+		#{DISCOUNT,jdbcType=VARCHAR}, #{PALLET_NO,jdbcType=VARCHAR}, #{PALLET_TIME,jdbcType=VARCHAR},
+		#{AVIATION_NO,jdbcType=VARCHAR}, #{DELIVERY_TIME,jdbcType=VARCHAR},
+		#{APPLY_STATUS,jdbcType=INTEGER},#{CUSTOMER_ID,jdbcType=VARCHAR}
+		)
+	</insert>
+
+
+</mapper>

@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ParcelMapper">
+
+	<!--表名 -->
+	<sql id="tableName">
+		T_PARCEL
+	</sql>
+
+	<!-- 字段 -->
+	<sql id="Field">
+		PACK_NAME,
+		PACK_TYPE,
+		PACK_TYPE_NAME,
+		FEE_SCALE,
+		WEIGHT,
+		PACK_COST,
+		GOODS_PK,
+		TOTAL_COST,
+		CREATEBY,
+		CREATETIME,
+		UPDATEBY,
+		UPDATETIME,
+		PACKJSONARR,
+		ORDER_ID,
+		COURIER,
+		COURIER_BM,
+		LOGISTICS,
+		P_APPLY_STATUS,
+		Printspec,
+		CODEVALUE,
+		Reweighting,
+		guid,
+		Sourceno,
+		XM_WEIGHT,
+		PARCEL_ID
+	</sql>
+
+	<!-- 字段值 -->
+	<sql id="FieldValue">
+		#{PACK_NAME},
+		#{PACK_TYPE},
+		#{PACK_TYPE_NAME},
+		#{FEE_SCALE},
+		#{WEIGHT},
+		#{PACK_COST},
+		#{GOODS_PK},
+		#{TOTAL_COST},
+		#{CREATEBY},
+		#{CREATETIME},
+		#{UPDATEBY},
+		#{UPDATETIME},
+		#{PACKJSONARR},
+		#{ORDER_ID},
+		#{COURIER},
+		#{COURIER_BM},
+		#{LOGISTICS},
+		#{P_APPLY_STATUS},
+		#{Printspec},
+		#{CODEVALUE},
+		#{Reweighting},
+		#{guid},
+		#{Sourceno},
+		#{XM_WEIGHT},
+		#{PARCEL_ID}
+	</sql>
+
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+		<include refid="tableName"></include>
+		(
+		<include refid="Field"></include>
+		) values (
+		<include refid="FieldValue"></include>
+		)
+	</insert>
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from
+		<include refid="tableName"></include>
+		where
+		PARCEL_ID = #{PARCEL_ID}
+	</delete>
+
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+		set
+		<if test="PACK_NAME!=null and PACK_NAME!=''">
+			PACK_NAME = #{PACK_NAME},
+		</if>
+		<if test="PACK_TYPE!=null and PACK_TYPE!=''">
+			PACK_TYPE = #{PACK_TYPE},
+		</if>
+		<if test="PACK_TYPE_NAME!=null and PACK_TYPE_NAME!=''">
+			PACK_TYPE_NAME = #{PACK_TYPE_NAME},
+		</if>
+		<if test="FEE_SCALE!=null">
+			FEE_SCALE = #{FEE_SCALE},
+		</if>
+		<if test="WEIGHT!=null">
+			WEIGHT = #{WEIGHT},
+		</if>
+		<if test="PACK_COST!=null">
+			PACK_COST = #{PACK_COST},
+		</if>
+		<if test="GOODS_PK!=null">
+			GOODS_PK = #{GOODS_PK},
+		</if>
+		<if test="TOTAL_COST!=null">
+			TOTAL_COST = #{TOTAL_COST},
+		</if>
+		<if test="CREATEBY!=null">
+			CREATEBY = #{CREATEBY},
+		</if>
+		<if test="CREATETIME!=null">
+			CREATETIME = #{CREATETIME},
+		</if>
+		<if test="UPDATEBY!=null">
+			UPDATEBY = #{UPDATEBY},
+		</if>
+		<if test="UPDATETIME!=null">
+			UPDATETIME = #{UPDATETIME},
+		</if>
+		<if test="PACKJSONARR!=null and PACKJSONARR!=''">
+			PACKJSONARR =#{PACKJSONARR},
+		</if>
+		<if test="ORDER_ID!=null and ORDER_ID!=''">
+			ORDER_ID = #{ORDER_ID},
+		</if>
+		<if test="COURIER!=null and COURIER!=''">
+			COURIER = #{COURIER},
+		</if>
+		<if test="COURIER_BM!=null and COURIER_BM!=''">
+			COURIER_BM = #{COURIER_BM},
+		</if>
+		<if test="LOGISTICS!=null and LOGISTICS!=''">
+			LOGISTICS = #{LOGISTICS},
+		</if>
+		<if test="APPLY_STATUS!=null">
+			P_APPLY_STATUS = #{APPLY_STATUS},
+		</if>
+		<if test="Printspec!=null">
+			Printspec =#{Printspec},
+		</if>
+		<if test="Reweighting!=null">
+			Reweighting = #{Reweighting},
+		</if>
+		<if test="guid!=null and guid!=''">
+			guid = #{guid},
+		</if>
+		<if test="Sourceno!=null and Sourceno!=''">
+		   Sourceno = #{Sourceno},
+		</if>
+		<if test="XM_WEIGHT!=null and XM_WEIGHT!=''">
+	    	XM_WEIGHT =#{XM_WEIGHT},
+		</if>	
+		PARCEL_ID = PARCEL_ID
+		where
+		PARCEL_ID = #{PARCEL_ID}
+	</update>
+
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		PARCEL_ID = #{PARCEL_ID}
+	</select>
+
+	<!-- 列表(获取待称重和待打托的列表) -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		SELECT
+		p.ORDER_ID,p.LOGISTICS,o.ADDRESSEE,o.CREATETIME,p.PARCEL_ID,p.P_APPLY_STATUS,p.Sourceno,o.ORDERNO,p.UPDATETIME,p.Reweighting
+		FROM
+		t_parcel p
+		LEFT JOIN t_order o ON p.ORDER_ID = o.ORDER_ID
+		where 1=1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+			p.LOGISTICS LIKE CONCAT('%', #{pd.keywords},'%')
+			)
+		</if>
+		<if test="pd.APPLY_STATUS!=null">
+			AND FIND_IN_SET(p.P_APPLY_STATUS,#{pd.APPLY_STATUS})
+		</if>
+		AND o.ISDELETE = 0
+	</select>
+
+
+	<!-- 列表(获取已打托的列表) -->
+	<select id="datalistPage_2" parameterType="page" resultType="pd">
+		SELECT
+		PALLET_NO,PALLET_TIME,COUNT(1) as parcelCount,P_APPLY_STATUS
+		FROM
+		t_parcel
+		WHERE P_APPLY_STATUS = 2
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+			PALLET_NO LIKE CONCAT('%', #{pd.keywords},'%')
+			)
+		</if>
+		GROUP BY PALLET_NO,PALLET_TIME,P_APPLY_STATUS
+	</select>
+
+   
+   
+   <!-- 总仓待揽收,已揽收，移交物流 ，4，5，6 -->
+	<select id="datalistPage_3" parameterType="page" resultType="pd">
+		SELECT
+		AVIATION_NO,DELIVERY_TIME,COUNT(1) as parcelCount,P_APPLY_STATUS
+		FROM
+		t_parcel
+		WHERE 1 = 1
+		<if test="pd.keywords!= null and pd.keywords != ''"><!-- 关键词检索 -->
+			and
+			(
+			PALLET_NO LIKE CONCAT('%', #{pd.keywords},'%')
+			)
+		</if>
+		<if test="pd.APPLY_STATUS!=null and pd.APPLY_STATUS!=''">
+		   AND P_APPLY_STATUS =  #{pd.APPLY_STATUS }
+		</if>
+		GROUP BY AVIATION_NO,DELIVERY_TIME,P_APPLY_STATUS
+	</select>
+
+
+
+
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+	</select>
+
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from
+		<include refid="tableName"></include>
+		where
+		PARCEL_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- fh313596790qq(青苔) -->
+	<resultMap id="BaseResultMap" type="com.fh.entity.order.Parcel">
+		<id column="PARCEL_ID" property="PARCEL_ID" jdbcType="VARCHAR" />
+		<result column="PACK_NAME" property="PACK_NAME" jdbcType="VARCHAR" />
+		<result column="PACK_TYPE" property="PACK_TYPE" jdbcType="VARCHAR" />
+		<result column="PACK_TYPE_NAME" property="PACK_TYPE_NAME"
+			jdbcType="VARCHAR" />
+		<result column="FEE_SCALE" property="FEE_SCALE" jdbcType="VARCHAR" />
+		<result column="WEIGHT" property="WEIGHT" jdbcType="VARCHAR" />
+		<result column="PACK_COST" property="PACK_COST" jdbcType="VARCHAR" />
+		<result column="CREATEBY" property="CREATEBY" jdbcType="VARCHAR" />
+		<result column="CREATETIME" property="CREATETIME" jdbcType="VARCHAR" />
+		<result column="UPDATEBY" property="UPDATEBY" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="UPDATETIME" jdbcType="VARCHAR" />
+		<result column="GOODS_PK" property="GOODS_PK" jdbcType="VARCHAR" />
+		<result column="TOTAL_COST" property="TOTAL_COST" jdbcType="VARCHAR" />
+		<result column="PACKJSONARR" property="PACKJSONARR" jdbcType="VARCHAR" />
+		<result column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+		<result column="COURIER" property="COURIER" jdbcType="VARCHAR" />
+		<result column="COURIER_BM" property="COURIER_BM" jdbcType="VARCHAR" />
+		<result column="LOGISTICS" property="LOGISTICS" jdbcType="VARCHAR" />
+		<result column="P_APPLY_STATUS" property="APPLY_STATUS" jdbcType="VARCHAR" />
+		<result column="guid" property="guid" jdbcType="VARCHAR" />
+		<result column="Sourceno" property="Sourceno" jdbcType="VARCHAR" />
+		<result column="Reweighting" property="reweighting" jdbcType="VARCHAR" />
+		<association property="parcelArticlesCount" column="GOODS_PK" select="ParcelArticlesMapper.selectCount"></association>
+		<collection property="msgBoards" column="PARCEL_ID" select="Msg_BoardMapper.selectBYParcelId"></collection>
+	</resultMap>
+
+
+
+	<resultMap id="BaseResultMap_2" type="com.fh.entity.order.Parcel">
+		<id column="PARCEL_ID" property="PARCEL_ID" jdbcType="VARCHAR" />
+		<result column="PACK_NAME" property="PACK_NAME" jdbcType="VARCHAR" />
+		<result column="PACK_TYPE" property="PACK_TYPE" jdbcType="VARCHAR" />
+		<result column="PACK_TYPE_NAME" property="PACK_TYPE_NAME" jdbcType="VARCHAR" />
+		<result column="FEE_SCALE" property="FEE_SCALE" jdbcType="VARCHAR" />
+		<result column="WEIGHT" property="WEIGHT" jdbcType="VARCHAR" />
+		<result column="PACK_COST" property="PACK_COST" jdbcType="VARCHAR" />
+		<result column="CREATEBY" property="CREATEBY" jdbcType="VARCHAR" />
+		<result column="CREATETIME" property="CREATETIME" jdbcType="VARCHAR" />
+		<result column="UPDATEBY" property="UPDATEBY" jdbcType="VARCHAR" />
+		<result column="UPDATETIME" property="UPDATETIME" jdbcType="VARCHAR" />
+		<result column="GOODS_PK" property="GOODS_PK" jdbcType="VARCHAR" />
+		<result column="TOTAL_COST" property="TOTAL_COST" jdbcType="VARCHAR" />
+		<result column="PACKJSONARR" property="PACKJSONARR" jdbcType="VARCHAR" />
+		<result column="ORDER_ID" property="ORDER_ID" jdbcType="VARCHAR" />
+		<result column="COURIER" property="COURIER" jdbcType="VARCHAR" />
+		<result column="COURIER_BM" property="COURIER_BM" jdbcType="VARCHAR" />
+		<result column="LOGISTICS" property="LOGISTICS" jdbcType="VARCHAR" />
+		<result column="P_APPLY_STATUS" property="APPLY_STATUS" jdbcType="VARCHAR" />
+		<result column="guid" property="guid" jdbcType="VARCHAR" />
+		<result column="Sourceno" property="Sourceno" jdbcType="VARCHAR" />
+		<result column="Reweighting" property="reweighting" jdbcType="VARCHAR" />
+		<association property="order" column="ORDER_ID" select="OrderMapper.selectByOrderId"></association>
+		<association property="parcelArticlesCount" column="GOODS_PK" select="ParcelArticlesMapper.selectCount"></association>
+        <collection property="parcelArticles" column="GOODS_PK" select="ParcelArticlesMapper.selectByPks"></collection>
+	</resultMap>
+
+
+	<!-- 根据托盘号获取包裹列表 -->
+	<select id="selectByPallet"  parameterType="String" resultMap="BaseResultMap_2" >
+       select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		PALLET_NO = #{PALLET_NO}
+	</select>
+	
+	<!-- 根据配货单号获取包裹列表 -->
+	<select id="selectBySourceno"  parameterType="String" resultMap="BaseResultMap_2" >
+       select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		Sourceno = #{Sourceno}
+	</select>
+	
+	<!-- 根据航班号获取包裹信息 -->
+	<select id="selectAviationNo" parameterType="String" resultMap="BaseResultMap_2">
+	   select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+	     AVIATION_NO = #{AVIATION_NO}
+	</select>
+	
+	
+    
+    <!-- 根据运单号获取包裹信息 -->
+	<select id="selectByLogistics" parameterType="String" resultMap="BaseResultMap_2">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		LOGISTICS = #{LOGISTICS}
+	</select>
+
+	
+	<!-- 根据订单主键获取包裹信息 -->
+	<select id="selectByOrderId" parameterType="String" resultMap="BaseResultMap">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		ORDER_ID = #{ORDER_ID}
+	</select>
+
+
+	<select id="selectById" parameterType="String" resultMap="BaseResultMap">
+		select
+		<include refid="Field"></include>
+		from
+		<include refid="tableName"></include>
+		where
+		PARCEL_ID = #{PARCEL_ID}
+	</select>
+
+
+	<!-- 根据订单主键获取包裹数量 -->
+	<select id="getCountByOrderId" parameterType="String"
+		resultType="int">
+		select
+		count(1)
+		from
+		<include refid="tableName"></include>
+		where
+		ORDER_ID = #{ORDER_ID}
+	</select>
+
+
+	<!-- 根据订单id更新运单获取状况 -->
+	<update id="editApplyStatus" parameterType="pd">
+		update
+		<include refid="tableName"></include>
+	    <set>
+			<if test="APPLY_STATUS!=null">
+				P_APPLY_STATUS = #{APPLY_STATUS},
+			</if>
+			<if test="AVIATION_NO !=null">
+				AVIATION_NO = #{AVIATION_NO},
+			</if>
+			<if test="DELIVERY_TIME !=null">
+				DELIVERY_TIME = #{DELIVERY_TIME},
+			</if>
+			<if test="PALLET_NO !=null">
+				PALLET_NO =#{PALLET_NO},
+			</if>
+			<if test="PALLET_TIME !=null"> 
+			  PALLET_TIME =#{PALLET_TIME},
+			</if>
+		</set>
+	    <trim prefix="where" prefixOverrides="and|or">
+			<if test="ORDER_ID !=null and ORDER_ID!=''">
+				AND find_in_set(ORDER_ID,#{ORDER_ID})
+			</if>
+			<if test="PALLET_NOS !=null and PALLET_NOS!=''">
+				AND find_in_set(PALLET_NO, #{PALLET_NOS})
+			</if>
+			<if test="PARCEL_IDS !=null and PARCEL_IDS !=''">
+				AND find_in_set(PARCEL_ID, #{PARCEL_IDS})
+			</if>
+			<if test="AVIATION_NOS !=null and AVIATION_NOS !=''">
+				AND find_in_set(AVIATION_NO, #{AVIATION_NOS})
+			</if>
+		</trim>		
+	</update>
+
+
+
+	<!-- 根据订单主键获取包裹名称最大的值 -->
+	<select id="selectMaxValue" parameterType="String" resultType="Integer">
+		SELECT MAX(CODEVALUE) from t_parcel where ORDER_ID= #{ORDER_ID}
+	</select>
+
+
+     <select id="selectParcelByExcel"  parameterType="java.lang.String" resultType="pd">
+		SELECT
+			p2.PARCEL_ID,
+			p2.LOGISTICS,
+			p2.SENDERSTR,
+			p2.ADDRESSEESTR,
+			p2.Reweighting,
+		    p2.TOTAL_COST,
+		    p2.CREATEBY,
+			a.PL_CODE,
+			a.PA_BRAND,
+			a.PA_PM,
+			a.PA_SPEC,
+			a.PA_COUNT,
+			a.PA_WEIGHT,
+			a.PA_PRICE
+		FROM
+		(
+		SELECT
+			p.PARCEL_ID,
+			o.ORDER_ID,
+			p.PALLET_NO,
+			p.GOODS_PK,
+			p.TOTAL_COST,
+			p.LOGISTICS,
+			p.Reweighting,
+			o.SENDERSTR,
+			o.ADDRESSEESTR,
+			o.CREATEBY
+		FROM
+		t_parcel p LEFT JOIN t_order o ON p.ORDER_ID = o.ORDER_ID
+		) p2,t_parcelarticles a WHERE
+		     FIND_IN_SET(a.PARCELARTICLES_ID,p2.GOODS_PK) AND
+		     FIND_IN_SET(p2.PALLET_NO, #{0}) 
+		 order by p2.PARCEL_ID    
+		     
+     </select>
+
+
+
+
+
+</mapper>

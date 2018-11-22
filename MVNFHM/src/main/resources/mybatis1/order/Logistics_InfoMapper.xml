@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Logistics_InfoMapper">
+
+
+	<resultMap id="BaseResultMap" type="com.fh.entity.order.LogisticsInfo">
+		<id column="LOGISTICS_INFO_ID" property="LOGISTICS_INFO_ID" jdbcType="INTEGER" />
+		<result column="ORDERID" property="ORDERID" jdbcType="VARCHAR" />
+		<result column="TIME" property="TIME" jdbcType="VARCHAR" />
+		<result column="STATUS" property="STATUS" jdbcType="VARCHAR" />
+	</resultMap>
+
+     <sql id="Base_Column_List" >
+       LOGISTICS_INFO_ID, ORDERID, TIME, STATUS
+    </sql>
+    
+	<insert id="insert" parameterType="com.fh.entity.order.LogisticsInfo">
+		insert into t_logistics_info
+		(ORDERID, TIME,STATUS)
+		values ( #{ORDERID,jdbcType=VARCHAR},
+		#{TIME,jdbcType=VARCHAR},#{STATUS,jdbcType=VARCHAR})
+	</insert>
+
+	<insert id="insertBatch" parameterType="com.fh.entity.order.LogisticsInfo">
+		insert into t_logistics_info (ORDERID, TIME,STATUS)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item.ORDERID,jdbcType=VARCHAR},#{item.TIME,jdbcType=VARCHAR},#{item.STATUS,jdbcType=VARCHAR})
+		</foreach>
+	</insert>
+
+	<!-- 根据订单查询数据 -->
+	<select id="selectByOrderId" parameterType="String" resultMap="BaseResultMap">
+       select 
+      <include refid="Base_Column_List" />
+       from t_logistics_info where ORDERID = #{ORDERID,jdbcType=INTEGER}
+	</select>
+
+</mapper>

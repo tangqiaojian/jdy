@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="req_dataMapper">
+
+	<resultMap id="BaseResultMap" type="com.fh.entity.order.ReqData">
+		<id column="PARCEL_ID" property="parcelId" jdbcType="VARCHAR" />
+		<result column="BarCode" property="barCode" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="ResultMapWithBLOBs" type="com.fh.entity.order.ReqData"
+		extends="BaseResultMap">
+		<result column="ReqData" property="reqdata" jdbcType="LONGVARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		PARCEL_ID,BarCode
+	</sql>
+	<sql id="Blob_Column_List">
+		ReqData
+	</sql>
+
+
+	<!-- 插入 -->
+	<insert id="insertSelective" parameterType="com.fh.entity.order.ReqData">
+		insert into t_reqdata
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="parcelId != null">
+				PARCEL_ID,
+			</if>
+			<if test="reqdata != null">
+				ReqData,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="parcelId != null">
+				#{parcelId,jdbcType=VARCHAR},
+			</if>
+			<if test="reqdata != null">
+				#{reqdata,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 根据包裹id查询 -->
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />,<include refid="Blob_Column_List" />
+		from t_reqdata
+		where PARCEL_ID = #{parcelId,jdbcType=VARCHAR}
+	</select>
+
+
+	<!-- 更新数据 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.fh.entity.order.ReqData">
+		update t_reqdata
+		<set>
+			<if test="reqdata != null">
+				ReqData = #{reqdata,jdbcType=LONGVARCHAR},
+			</if>
+			<if test="barCode != null">
+			     BarCode =#{barCode,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where PARCEL_ID = #{parcelId,jdbcType=VARCHAR}
+	</update>
+
+
+</mapper>
