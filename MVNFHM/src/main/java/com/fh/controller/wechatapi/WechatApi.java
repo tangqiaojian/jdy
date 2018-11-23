@@ -6,8 +6,8 @@ import com.fh.dao.DaoSupport;
 import com.fh.entity.system.User;
 import com.fh.service.system.fhlog.FHlogManager;
 import com.fh.service.system.user.UserManager;
+import com.fh.service.wechat.wechat.WechatApiManager;
 import com.fh.util.*;
-import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -15,17 +15,14 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.omg.CORBA.Object;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.omg.PortableServer.IdAssignmentPolicyValue.USER_ID;
 
 /**
  * @Author: Cdl Q765371590
@@ -39,6 +36,8 @@ public class WechatApi {
     private UserManager userService;
     @Resource(name = "fhlogService")
     private FHlogManager FHLOG;
+    @Resource(name ="WechatApiService" )
+    private WechatApiManager wechatApiManager;
 
     /**
      * 登录验证
@@ -176,6 +175,44 @@ public class WechatApi {
 
         return json;
     }
+
+    /**
+     *密码修改
+     */
+    @RequestMapping(value = "/updatePwd.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
+    @ResponseBody
+
+    @CrossOrigin(origins = "*", maxAge = 3600)
+    public JsonResult updatePwd(
+            @RequestParam(required = false, value = "USER_ID") String USER_ID,//用户名
+            @RequestParam(required = false, value = "PASSWORD") String PASSWORD ,//密码
+            @RequestParam(required = false, value = "ORIGINAL_PASSWORD") String ORIGINAL_PASSWORD ,//原密码
+            HttpServletRequest request
+    ) throws Exception {
+        JsonResult j=JsonResult.of();
+        String result;
+        //获取当前用户所有信息
+        User user=userService.getUserAndRoleById(USER_ID);
+        //原密码加密比较
+        String passwd = new SimpleHash("SHA-1", user.getUSERNAME(), ORIGINAL_PASSWORD).toString();
+        //判断密码是否与原密码一致
+        if (user.getPASSWORD().equals(passwd)){
+            PageData pd=new PageData();
+            String password = new SimpleHash("SHA-1", USER_ID, PASSWORD).toString();
+            pd.put("PASSWORD",password);
+            pd.put("USERID",USER_ID);
+            //修改密码
+            wechatApiManager.edit(pd);
+            result="密码修改成功";
+            j.put("result",result);
+        }else {
+            result="原密码输入错误";
+            j.put("result",result);
+        }
+
+        return j;
+    }
+
     /**
      *
      * 门店信息
@@ -196,7 +233,7 @@ public class WechatApi {
      * 我的信息
      *
      */
-    @RequestMapping(value = "/MsgToMe.json", produces = "application/json"/*,method = RequestMethod.GET*/)
+    @RequestMapping(value = "/MsgToMe.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin(origins = "*", maxAge = 3600)
     public JsonResult MsgToMe(HttpServletRequest request) throws Exception {
@@ -205,12 +242,21 @@ public class WechatApi {
         String USER_ID=request.getParameter("USER_ID");
         //查找用户信息
         User user=userService.getUserAndRoleById(USER_ID);
-        //   JSONArray j=JSONArray.fromObject(request.getSession().getAttribute(Const.SESSION_USER));
-        /*        User user=userService.getUserAndRoleById(USER_ID);*/
+        //获取所有门店
+        List<Map<String, Object>> s=userService.getStore();
+        //将id转为门店名称
+        for(int i=0;i<s.size();i++) {
+            String  a= String.valueOf(s.get(i).get("STORE_ID"));
+            if (user.getSTORE().equals(a)){
+                json.put("Store_allMsg",s.get(i).get("S_NAME"));
+            }
+        }
         json.put("Msg",user);
 
         return json;
     }
+
+
 
 }
 
