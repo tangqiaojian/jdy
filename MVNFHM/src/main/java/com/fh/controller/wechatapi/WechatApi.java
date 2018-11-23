@@ -198,7 +198,7 @@ public class WechatApi {
         //判断密码是否与原密码一致
         if (user.getPASSWORD().equals(passwd)){
             PageData pd=new PageData();
-            String password = new SimpleHash("SHA-1", USER_ID, PASSWORD).toString();
+            String password = new SimpleHash("SHA-1", user.getUSERNAME(), PASSWORD).toString();
             pd.put("PASSWORD",password);
             pd.put("USERID",USER_ID);
             //修改密码
@@ -230,6 +230,38 @@ public class WechatApi {
     }
 
     /**
+     * 门店修改
+     */
+    @RequestMapping(value = "/updateStore.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
+    @ResponseBody
+
+    @CrossOrigin(origins = "*", maxAge = 3600)
+    public JsonResult updateStore(
+            @RequestParam(required = false, value = "USER_ID") String USER_ID,//用户名
+            @RequestParam(required = false, value = "STORE_ID") String STORE_ID ,//门店id
+            HttpServletRequest request
+    ) throws Exception {
+        JsonResult j=JsonResult.of();
+        String result;
+        //获取当前用户所有信息
+        User user=userService.getUserAndRoleById(USER_ID);
+        //获取更换门店id
+            PageData pd=new PageData();
+            pd.put("STORE",STORE_ID);
+            pd.put("USERID",USER_ID);
+            try {
+                //修改门店信息
+                wechatApiManager.editStore(pd);
+                result = "门店修改成功";
+                j.put("result", result);
+            }catch (Exception e){
+                result="门店修改失败";
+                j.put("result", result);
+            }
+        return j;
+    }
+
+    /**
      * 我的信息
      *
      */
@@ -252,12 +284,108 @@ public class WechatApi {
             }
         }
         json.put("Msg",user);
+        return json;
+    }
+    /**
+     * 所有类别
+     */
+    @RequestMapping(value = "/allProduct.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
+    @ResponseBody
+    @CrossOrigin(origins = "*", maxAge = 3600)
+    public JsonResult allProduct(HttpServletRequest request) throws Exception {
+        String result;
+        JsonResult json=new JsonResult();
+        try {
+        //获取所有类别
+        List all=wechatApiManager.allProduct(null);
+        json.put("all",all);
+            result="获取成功";
+            json.put("result",result);
+        }catch (Exception e){
+            result="获取失败";
+            json.put("result",result);
+        }
+        return json;
+    }
+    /**
+     *所有品牌
+     */
+    @RequestMapping(value = "/allProductBand.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
+    @ResponseBody
+    @CrossOrigin(origins = "*", maxAge = 3600)
+    public JsonResult allProductBand(
+            @RequestParam(required = false,value = "PL_TYPE")String PL_TYPE
+    ) throws Exception {
+        String result;
+        JsonResult json=new JsonResult();
+        PageData pd=new PageData();
+        pd.put("PRODUCTID",PL_TYPE);
+        try {
+
+        //获取所有品牌
+        List all=wechatApiManager.allProductBand(pd);
+        json.put("all",all);
+            result="获取成功";
+            json.put("result",result);
+        }catch (Exception e){
+            result="获取失败";
+            json.put("result",result);
+        }
+        return json;
+    }
+
+    /**
+     * 所有品名
+     */
+    @RequestMapping(value = "/allProductName.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
+    @ResponseBody
+    @CrossOrigin(origins = "*", maxAge = 3600)
+    public JsonResult allProductName(
+            @RequestParam(required = false,value = "PL_BRAND")String PL_BRAND
+    ) throws Exception {
+        String result;
+        JsonResult json=new JsonResult();
+        PageData pd=new PageData();
+        pd.put("PL_BRAND",PL_BRAND);
+       try {
+        //获取所有品名
+        List all=wechatApiManager.allProductName(pd);
+        json.put("all",all);
+        result="获取成功";
+        json.put("result",result);
+        }catch (Exception e){
+        result="获取失败";
+        json.put("result",result);
+    }
 
         return json;
     }
 
-
-
+    /**
+     * 产品规格
+     */
+    @RequestMapping(value = "/allProductSize.json", produces = "application/json"/*,method = RequestMethod.GET*/,method = RequestMethod.POST)
+    @ResponseBody
+    @CrossOrigin(origins = "*", maxAge = 3600)
+    public JsonResult allProductSize(
+            @RequestParam(required = false,value = "PL_NAME")String PL_NAME
+    ) throws Exception {
+        String result;
+        JsonResult json=new JsonResult();
+        PageData pd=new PageData();
+        pd.put("PL_NAME",PL_NAME);
+        try {
+            //获取规格
+            List all=wechatApiManager.allProductSize(pd);
+            json.put("all",all);
+            result="获取成功";
+            json.put("result",result);
+        }catch (Exception e){
+            result="获取失败";
+            json.put("result",result);
+        }
+        return json;
+    }
 }
 
 

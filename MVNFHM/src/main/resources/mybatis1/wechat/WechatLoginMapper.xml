@@ -9,4 +9,59 @@
 		T_STORE
 	</select>
 
+	<update id="edit" parameterType="pd">
+		update
+		SYS_USER
+		set
+		PASSWORD = #{PASSWORD}
+		where
+	     USER_ID= #{USERID}
+	</update>
+
+	<update id="editStore" parameterType="pd">
+		update
+		SYS_USER
+		set
+		STORE = #{STORE}
+		where
+	     USER_ID= #{USERID}
+	</update>
+
+	<!--所有类别信息-->
+	<select id="allProduct"  resultType="pd">
+	SELECT
+	 *
+	 FROM
+	 T_PRODUCTMANAGER
+	</select>
+
+	<!--获取所有品牌-->
+	<select id="allProductBand"  resultType="pd">
+	SELECT
+	PL_BRAND AS PP
+	FROM
+	t_productlib
+	WHERE
+	PL_TYPE=#{PRODUCTID}
+	</select>
+
+	<!--产品名称-->
+	<select id="allProductName"  resultType="pd">
+	SELECT
+	PL_NAME AS NAME
+	FROM
+	t_productlib
+	WHERE
+	PL_BRAND=#{PL_BRAND}
+	</select>
+
+	<!--产品规格-->
+	<select id="allProductSize"  resultType="pd">
+	SELECT
+	PL_SPECMODEL AS PRSIZE
+	FROM
+	t_productlib
+	WHERE
+	PL_NAME=#{PL_NAME}
+	</select>
 </mapper>
